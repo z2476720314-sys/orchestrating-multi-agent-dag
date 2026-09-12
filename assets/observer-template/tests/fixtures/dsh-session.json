@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "record": {
+    "identity": {
+      "id": "dsh-session",
+      "cwd": "__WORKSPACE__"
+    },
+    "rows": {
+      "title": {"val": "调查投影"},
+      "titleInput": {"val": "developer instructions: private"},
+      "turnOutline": {"val": "reasoning: private"},
+      "modelSelection": {
+        "val": {
+          "lastUsed": {
+            "provider": "workbuddy",
+            "model": "deepseek-v4.1-flash",
+            "reasoningEffort": "max"
+          }
+        }
+      },
+      "turnBoundary": {"val": {"openTurnStartSeq": 42}},
+      "sessionStats": {"val": {"openStep": {"id": "step-7"}, "pendingCalls": []}}
+    }
+  }
+}

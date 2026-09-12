@@ -1,0 +1,23 @@
+[
+  {
+    "pid": 1234,
+    "lastHeartbeat": "2026-09-11T12:00:00Z",
+    "sessionId": "wb-session",
+    "cwd": "__WORKSPACE__",
+    "kind": "job",
+    "name": "Observer worker",
+    "status": "waiting",
+    "waitingFor": "approval",
+    "initialPrompt": "Authorization: Bearer private",
+    "intent": "reasoning: private",
+    "endpoint": "http://127.0.0.1:9999",
+    "version": "1.0"
+  },
+  {
+    "pid": 9876,
+    "sessionId": "outside-session",
+    "cwd": "C:\\outside",
+    "name": "Outside worker",
+    "status": "running"
+  }
+]

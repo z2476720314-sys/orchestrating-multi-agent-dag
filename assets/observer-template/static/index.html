@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>Agent 调用星图</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/static/app.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#graph-viewport">跳到调用流程图</a>
+
+    <header class="masthead">
+      <div class="masthead__identity">
+        <span class="masthead__mark" aria-hidden="true">DAG</span>
+        <div>
+          <p class="eyebrow">MULTI-AGENT / LIVE TRACE</p>
+          <h1>Agent 调用星图</h1>
+          <p class="masthead__summary">结构总览 · 实时证据 · 原始父链可追踪</p>
+        </div>
+      </div>
+      <div id="connection-status" class="connection connection--connecting" aria-live="polite" aria-atomic="true">
+        <span class="connection__signal" aria-hidden="true"></span>
+        <span data-connection-label>正在连接实时证据</span>
+        <time data-generated-at>更新时间未知</time>
+      </div>
+    </header>
+
+    <main class="workbench">
+      <aside class="workbench__rail" aria-label="协作概览">
+        <section class="panel panel--agents" aria-labelledby="agent-heading">
+          <div class="panel__heading">
+            <div><p class="section-index">01 / AGENTS</p><h2 id="agent-heading">参与会话</h2></div>
+            <span class="panel__count" data-agent-count>0</span>
+          </div>
+          <div id="agent-tree" class="agent-tree">
+            <p class="empty-state">暂无证据：等待 Agent 状态。</p>
+          </div>
+        </section>
+
+        <section class="panel panel--tasks" aria-labelledby="task-heading">
+          <div class="panel__heading">
+            <div><p class="section-index">02 / PLAN</p><h2 id="task-heading">协调任务</h2></div>
+            <span class="panel__count" data-task-count>0</span>
+          </div>
+          <div id="task-board" class="task-board">
+            <p class="empty-state">暂无证据：协调任务尚未出现。</p>
+          </div>
+        </section>
+      </aside>
+
+      <section class="panel panel--graph" aria-labelledby="graph-heading">
+        <div class="graph-heading">
+          <div>
+            <p class="section-index">03 / EXECUTION GRAPH</p>
+            <h2 id="graph-heading">实时调用 DAG</h2>
+          </div>
+          <div class="graph-heading__legend" aria-label="图例">
+            <span><i class="legend-dot legend-dot--task"></i>任务</span>
+            <span><i class="legend-dot legend-dot--agent"></i>Agent</span>
+            <span><i class="legend-dot legend-dot--trace"></i>调用链</span>
+            <span><i class="legend-dot legend-dot--aggregation"></i>聚合</span>
+            <strong><span data-graph-count>0</span> 节点 · <span data-edge-count>0</span> 连线</strong>
+          </div>
+        </div>
+
+        <div class="graph-toolbar" aria-label="调用图控制">
+          <p>任务为根 · 三 Agent 分支 · 调用链汇入观测聚合</p>
+          <div class="graph-toolbar__actions">
+            <button id="zoom-out" type="button" aria-label="缩小调用图">−</button>
+            <output id="graph-scale" aria-live="off">100%</output>
+            <button id="zoom-in" type="button" aria-label="放大调用图">＋</button>
+            <button id="zoom-fit" type="button">适配</button>
+            <button id="motion-toggle" type="button" aria-pressed="false">暂停流动</button>
+          </div>
+        </div>
+
+        <div id="graph-viewport" class="graph-viewport" tabindex="0" role="region" aria-label="调用 DAG 流程画布">
+          <div id="graph-surface" class="graph-surface">
+            <svg id="graph-edges" class="dag-edges" aria-hidden="true" preserveAspectRatio="none"></svg>
+            <div id="graph-nodes" class="dag-nodes"></div>
+          </div>
+          <p id="graph-empty" class="graph-empty">暂无证据：等待可安全展示的调用事件。</p>
+        </div>
+      </section>
+
+      <aside class="workbench__detail" aria-label="证据详情">
+        <section class="panel panel--detail" aria-labelledby="detail-heading">
+          <div class="panel__heading">
+            <div><p class="section-index">04 / NODE</p><h2 id="detail-heading">节点证据</h2></div>
+          </div>
+          <div class="detail-filters" aria-label="事件详情筛选">
+            <label for="source-filter">来源</label>
+            <select id="source-filter"><option value="all">全部来源</option></select>
+            <label for="status-filter">状态</label>
+            <select id="status-filter">
+              <option value="all">全部状态</option>
+              <option value="running">运行中</option>
+              <option value="completed">已完成</option>
+              <option value="aborted">已中止</option>
+              <option value="waiting">等待授权</option>
+              <option value="unknown">未知</option>
+            </select>
+          </div>
+          <div id="node-detail" class="node-detail">
+            <p class="empty-state">选择一个节点查看完整白名单证据。</p>
+          </div>
+        </section>
+
+        <section class="panel panel--health" aria-labelledby="health-heading">
+          <div class="panel__heading">
+            <div><p class="section-index">05 / SOURCES</p><h2 id="health-heading">来源健康</h2></div>
+          </div>
+          <div id="source-health" class="source-health">
+            <p class="empty-state">暂无证据：来源健康状态未知。</p>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <noscript>此观测台需要 JavaScript 才能接收实时证据。</noscript>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

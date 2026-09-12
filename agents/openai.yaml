@@ -1,0 +1,8 @@
+interface:
+  display_name: "多 Agent DAG 协作"
+  short_description: "协调 Codex、DSH 与 WorkBuddy，并启动实时 DAG 观测台"
+  brand_color: "#6EA8FF"
+  default_prompt: "使用 $orchestrating-multi-agent-dag 在当前工作区启动多 Agent 协作，明确任务分工、文件所有权与验收标准，并打开实时 DAG 观测台。"
+
+policy:
+  allow_implicit_invocation: true
