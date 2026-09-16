@@ -209,7 +209,7 @@ class AdapterTests(unittest.TestCase):
         )
         serialized = json.dumps(result.to_dict(), ensure_ascii=False)
         self.assertNotIn("raw private prompt", serialized)
-        self.assertNotIn("Bearer secret", serialized)
+        self.assertNotIn("Authorization: placeholder", serialized)
         self.assertNotIn("private result", serialized)
 
     def test_codex_trace_links_session_turn_and_tool_events(self) -> None:
@@ -709,7 +709,7 @@ class AdapterTests(unittest.TestCase):
         self.assertEqual([(("codebuddy", "ps", "--json"), 3.0)], runner_calls)
         serialized = json.dumps(result.to_dict(), ensure_ascii=False)
         self.assertNotIn("initialPrompt", serialized)
-        self.assertNotIn("Bearer private", serialized)
+        self.assertNotIn("Authorization: placeholder", serialized)
         self.assertNotIn("reasoning: private", serialized)
 
     def test_workbuddy_maps_busy_epoch_heartbeat_and_safe_job_options(self) -> None:

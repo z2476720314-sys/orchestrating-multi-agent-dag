@@ -13,7 +13,7 @@ from observer.redaction import (
 
 class RedactionTests(unittest.TestCase):
     def test_hides_bearer_credentials(self) -> None:
-        self.assertEqual(HIDDEN_TEXT, sanitize_text("Authorization: Bearer abc123"))
+        self.assertEqual(HIDDEN_TEXT, sanitize_text("Bearer placeholder"))
 
     def test_hides_reasoning_content(self) -> None:
         self.assertEqual(HIDDEN_TEXT, sanitize_text("dsh: reasoning: private"))

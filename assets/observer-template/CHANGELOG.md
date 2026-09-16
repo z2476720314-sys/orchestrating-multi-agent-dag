@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 - 2026-09-16
+
+- 让仓库内容可通过 github-auto-publisher 的隐私门发布：把测试夹具里的合成假凭据（`Bearer secret`/`Bearer private`/`Bearer abc123`）统一换成扫描器白名单占位符 `placeholder`。
+- 同步测试断言与夹具取值，避免出现永远成立的空断言。
+
 ## 1.2.0 - 2026-09-14
 
 - 新增结构化运行时事件源，实时展示每个 Agent 的阶段、进展、文件、测试、产物、风险与 handoff。

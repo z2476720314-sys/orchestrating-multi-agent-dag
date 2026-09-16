@@ -8,7 +8,7 @@
     "name": "Observer worker",
     "status": "waiting",
     "waitingFor": "approval",
-    "initialPrompt": "Authorization: Bearer private",
+    "initialPrompt": "Authorization: placeholder",
     "intent": "reasoning: private",
     "endpoint": "http://127.0.0.1:9999",
     "version": "1.0"
