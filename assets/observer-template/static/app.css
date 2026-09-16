@@ -381,6 +381,13 @@ h2 {
   font-size: 0.61rem;
 }
 
+.task__progress {
+  margin: 0.48rem 0 0;
+  color: #d7e7ff;
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
 .agent-overflow {
   margin: 0;
   padding: 0.58rem;
@@ -768,6 +775,60 @@ h2 {
   display: grid;
   gap: 0.48rem;
   margin-top: 0.8rem;
+}
+
+.progress-feed,
+.delivery-feed {
+  display: grid;
+  gap: 0.48rem;
+  margin-top: 0.8rem;
+}
+
+.progress-entry,
+.delivery-entry {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--status-color, var(--cyan));
+  background: var(--panel-raised);
+}
+
+.progress-entry__title,
+.delivery-entry__title {
+  color: #f4f8ff;
+  font-size: 0.72rem;
+}
+
+.progress-entry__meta,
+.delivery-entry__meta,
+.delivery-entry__row {
+  color: var(--ink-soft);
+  font-family: var(--utility);
+  font-size: 0.56rem;
+  line-height: 1.45;
+}
+
+.progress-entry__detail {
+  margin: 0;
+  color: #d7e7ff;
+  font-size: 0.66rem;
+  line-height: 1.5;
+}
+
+.delivery-entry__row {
+  display: grid;
+  grid-template-columns: minmax(4.9rem, auto) 1fr;
+  gap: 0.48rem;
+}
+
+.delivery-entry__label {
+  color: #b8cbeb;
+}
+
+.delivery-entry__value {
+  overflow-wrap: anywhere;
+  color: #d7e7ff;
 }
 
 .detail-events__heading {

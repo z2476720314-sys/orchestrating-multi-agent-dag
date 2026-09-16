@@ -159,12 +159,22 @@ function Copy-ObserverTemplate {
             continue
         }
 
-        $timestamp = Get-Date -Format 'yyyyMMdd-HHmmssfff'
-        $uniqueSuffix = [guid]::NewGuid().ToString('N')
-        $backupFile = "$targetFile.bak-$timestamp-$uniqueSuffix"
-        Copy-Item -LiteralPath $targetFile -Destination $backupFile
+        $codeExtensions = @('.py', '.js', '.css', '.ps1', '.ts', '.tsx', '.vue')
+        $backupFile = $null
+        $extension = [System.IO.Path]::GetExtension($targetFile).ToLowerInvariant()
+        if ($codeExtensions -contains $extension) {
+            $timestamp = Get-Date -Format 'yyyyMMdd-HHmmssfff'
+            $uniqueSuffix = [guid]::NewGuid().ToString('N')
+            $backupFile = "$targetFile.bak-$timestamp-$uniqueSuffix"
+            Copy-Item -LiteralPath $targetFile -Destination $backupFile
+        }
         Copy-Item -LiteralPath $sourceFile.FullName -Destination $targetFile -Force
-        $Refreshed.Add("$targetFile (backup: $backupFile)")
+        if ($null -ne $backupFile) {
+            $Refreshed.Add("$targetFile (backup: $backupFile)")
+        }
+        else {
+            $Refreshed.Add($targetFile)
+        }
     }
 }
 

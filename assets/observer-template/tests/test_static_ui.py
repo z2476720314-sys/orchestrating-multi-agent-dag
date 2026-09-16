@@ -277,6 +277,11 @@ const detailScopes = ids.get("node-detail").querySelectorAll(".detail-event__sco
   .map((item) => item.textContent);
 const detailTimes = ids.get("node-detail").querySelectorAll(".detail-event__time")
   .map((item) => item.textContent);
+const progressDetails = ids.get("node-detail").querySelectorAll(".progress-entry__detail")
+  .map((item) => item.textContent);
+const textTree = (item) => [item.textContent, ...item.children.map(textTree)].join(" ");
+const deliveryDetails = ids.get("node-detail").querySelectorAll(".delivery-entry")
+  .map(textTree);
 process.stdout.write(JSON.stringify({
   connectionLabel: connectionLabel.textContent,
   firstStatus,
@@ -292,6 +297,8 @@ process.stdout.write(JSON.stringify({
   preserveAspectRatio: svg.getAttribute("preserveAspectRatio"),
   detailScopes,
   detailTimes,
+  progressDetails,
+  deliveryDetails,
 }));
 '''
         completed = subprocess.run(
@@ -348,6 +355,24 @@ process.stdout.write(JSON.stringify({
                     "status": "completed", "kind": "tool", "title": "运行测试",
                     "tool_name": "exec_command", "started_at": "2026-09-12T00:00:02Z",
                     "ended_at": "2026-09-12T00:00:04Z",
+                },
+                {
+                    "id": "evt:progress", "parent_id": "evt:turn",
+                    "agent_id": "codex:root", "source": "codex",
+                    "task_id": "task:current", "phase": "testing",
+                    "status": "running", "kind": "progress", "title": "测试进展",
+                    "detail": "正在运行观察器测试", "evidence_refs": ["tests/test_runtime.py"],
+                    "started_at": "2026-09-12T00:00:03Z",
+                },
+                {
+                    "id": "evt:delivery", "parent_id": "evt:turn",
+                    "agent_id": "codex:root", "source": "codex",
+                    "task_id": "task:current", "phase": "delivered",
+                    "status": "completed", "kind": "delivery", "title": "Agent 交付",
+                    "detail": "实时进度功能已交付", "deliverables": ["observer/runtime.py"],
+                    "tests": ["pytest: 3 passed"], "artifacts": ["artifacts/proof.png"],
+                    "handoff": "handoffs/task-current.md", "concerns": ["无"],
+                    "ended_at": "2026-09-12T00:00:05Z",
                 },
                 {
                     "id": "evt:orphan", "parent_id": "evt:missing",
@@ -517,7 +542,7 @@ process.stdout.write(JSON.stringify({
         self.assertEqual("unknown", nodes["trace:dsh"]["status"])
         self.assertIn("0 个关联会话", nodes["agent:dsh"]["text"])
         self.assertIn("0 条事件", nodes["trace:dsh"]["text"])
-        self.assertIn("3 条事件", nodes["trace:codex"]["text"])
+        self.assertIn("5 条事件", nodes["trace:codex"]["text"])
 
     def test_completed_current_coordination_task_stays_the_dag_root(self) -> None:
         snapshot = self._sample_snapshot()
@@ -649,6 +674,16 @@ process.stdout.write(JSON.stringify({
             if value.startswith("Start ") and " · End " in value
         ]
         self.assertTrue(matching_times)
+
+    def test_agent_detail_separates_live_progress_and_delivery_content(self) -> None:
+        rendered = self.run_renderer(self._sample_snapshot())
+
+        self.assertIn("正在运行观察器测试", rendered["progressDetails"])
+        delivery = " ".join(rendered["deliveryDetails"])
+        self.assertIn("实时进度功能已交付", delivery)
+        self.assertIn("observer/runtime.py", delivery)
+        self.assertIn("pytest: 3 passed", delivery)
+        self.assertIn("handoffs/task-current.md", delivery)
 
     def test_dynamic_content_uses_text_content_not_html_injection(self) -> None:
         self.assertIn("textContent", self.js)

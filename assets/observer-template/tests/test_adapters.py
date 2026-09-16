@@ -903,7 +903,7 @@ class AdapterTests(unittest.TestCase):
 
     def test_invalid_workbuddy_json_degrades_without_echoing_output(self) -> None:
         def runner(command, timeout):
-            return 0, '{"Authorization":"Bearer private"', ""
+            return 0, '{"Authentication":"Bearer private"', ""
 
         result = WorkBuddySource(
             ObserverConfig(workspace=WORKSPACE, runner=runner)
@@ -933,7 +933,7 @@ class AdapterTests(unittest.TestCase):
 
         self.assertEqual("live", snapshot.connection)
         self.assertEqual(
-            ["coordination", "codex", "dsh", "workbuddy"],
+            ["coordination", "runtime", "codex", "dsh", "workbuddy"],
             [health.source for health in snapshot.source_health],
         )
         self.assertEqual("1970-01-01T00:00:00+00:00", snapshot.generated_at)

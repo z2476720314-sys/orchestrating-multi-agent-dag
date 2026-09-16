@@ -40,6 +40,8 @@ class TaskState:
     status_evidence: str = NO_EVIDENCE
     source: str = "coordination"
     updated_at: str | None = None
+    phase: str | None = None
+    last_progress: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -59,6 +61,13 @@ class TraceEvent:
     evidence: str = NO_EVIDENCE
     exit_code: int | None = None
     tool_name: str | None = None
+    phase: str | None = None
+    evidence_refs: tuple[str, ...] = ()
+    deliverables: tuple[str, ...] = ()
+    tests: tuple[str, ...] = ()
+    artifacts: tuple[str, ...] = ()
+    handoff: str | None = None
+    concerns: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -121,3 +130,5 @@ class ObserverConfig:
     codex_tail_bytes: int = 1_048_576
     workbuddy_jobs_dir: Path | None = None
     command_timeout_seconds: float = 3.0
+    runtime_events_path: Path | None = None
+    max_runtime_bytes: int = 8_388_608

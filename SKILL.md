@@ -5,58 +5,37 @@ description: Use when coordinating Codex, DSH, and WorkBuddy across a complex ta
 
 # Orchestrating Multi-Agent DAG
 
-## Start safely
+## Start before dispatch
 
-1. Read user/project rules, focused Mnemon memories, `.agent-coordination/README.md`, `status.md`, and `git status --short`.
-2. If `.agent-coordination` is absent, run:
-
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\orchestrating-multi-agent-dag\scripts\init-coordination.ps1" -Workspace (Get-Location).Path
-   ```
-
-3. Do not overwrite an existing coordination directory. Treat all existing source changes as user-owned.
-
-## Build the execution DAG
-
-Give every unit a unique `task_id`, owner, objective, dependencies, read/write scope, prohibitions, success evidence, and handoff path. One file has one writer at a time. Parallelize only independent units; keep shared ports, profiles, build outputs, and integration steps serialized.
-
-Use [roles and routing](references/roles-and-routing.md) before dispatching DSH or WorkBuddy. Use [task and handoff contract](references/task-and-handoff-contract.md) for every prompt. Use [observer and evidence contract](references/observer-evidence-contract.md) when rendering or reporting state.
-
-## Execute and reconcile
-
-- Codex coordinates, resolves dependencies, integrates, and performs final verification.
-- DSH defaults to investigation, validation, or read-only review; grant writes only through an exact task scope.
-- WorkBuddy handles bounded implementation, tests, or real-entry acceptance; grant writes only through an exact task scope.
-- Record confirmed durable facts and failure lessons in Mnemon; never store secrets or short-lived noise.
-- Require a self-contained handoff from each worker. Independently inspect files, commands, exit codes, tests, and the real entry point before marking `DONE`.
-
-## Observe
-
-From `.agent-coordination` run:
+Run this once from the target workspace. It installs or refreshes the observer, starts or reuses its hidden process, verifies health, and opens the live DAG page by default:
 
 ```powershell
-.\observer\start-observer.ps1
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\orchestrating-multi-agent-dag\scripts\start-workflow.ps1" -Workspace (Get-Location).Path
 ```
 
-The center canvas is the fixed A·DAG overview: task root → three Agents → three trace summaries → aggregation. Raw event parent chains belong only in the detail panel.
+Use `-NoBrowser` only when the user explicitly does not want the page opened.
 
-## Example
+## Model judgment
 
-For `catalog-import-20260912`: assign DSH a read-only API-contract investigation, WorkBuddy exclusive write ownership of the importer and its tests, and Codex ownership of integration docs and final validation. Both branches depend on the root task; WorkBuddy implementation depends on DSH's reviewed contract. Each writes `handoffs/<task_id>-<owner>.md`; Codex updates `status.md` only after checking the evidence.
+The model decides only:
 
-## Quick reference
+- task boundaries and dependencies;
+- the single owner and non-overlapping read/write scope;
+- success evidence, prohibitions, and whether work is ready to integrate;
+- honest `blocked`/`failed` states when evidence is insufficient.
 
-| Need | Rule |
-|---|---|
-| DSH model | Verify `agent-default-model = workbuddy/deepseek-v4.1-flash`, effort `max`; Headless has no per-run model flags |
-| WorkBuddy model | Pass `--model glm-5.3-flash --effort high` every run |
-| Status | `accepted`/process exit/self-report are not completion |
-| Missing linkage | Show `unknown`; never infer a parent/task |
-| Existing files | Preserve by default; refresh observer only when explicitly intended |
+Keep shared files, ports, profiles, build outputs, and integration steps serialized. Never infer progress, percentages, ETA, or completion.
 
-## Common mistakes
+## Deterministic workflow
 
-- Do not give two Agents overlapping write scopes.
-- Do not copy Web/Headless profiles, subscriptions, cookies, credentials, or unrelated Skills.
-- Do not turn every raw event into a main-graph node.
-- Do not invent progress percentages, ETA, model selection, or successful validation.
+Use `scripts\workflow.py task --help` to register each task before dispatch. The command writes a task brief under `.agent-coordination/runtime/briefs/`; give that file to the assigned Agent and require it to follow the embedded commands.
+
+Agents record a `progress` event at each meaningful phase change and exactly one `deliver` event when they stop. The scripts sanitize content, append the runtime ledger, and create the handoff; do not hand-format those files.
+
+The observer merges this ledger with native lifecycle signals and streams updates through SSE. The fixed A·DAG remains the overview; select an Agent/task to see “实时进展” and “交付内容”.
+
+## Completion gate
+
+The coordinator independently checks changed files, tests, artifacts, handoff, exit status, and the real user-facing entry point. A process exit or Agent self-report alone is not completion.
+
+Never record prompts, private reasoning, credentials, cookies, or raw tool input/output. For unusual DSH/WorkBuddy routing only, consult `references/roles-and-routing.md`.

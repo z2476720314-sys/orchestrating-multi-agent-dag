@@ -44,6 +44,7 @@ $requiredFiles = @(
     (Join-Path $coordinationRoot 'observer\static\app.css'),
     (Join-Path $coordinationRoot 'observer\static\app.js'),
     (Join-Path $coordinationRoot 'observer\observer\engine.py')
+    (Join-Path $coordinationRoot 'observer\observer\adapters\runtime.py')
 )
 
 $missing = @($requiredFiles | Where-Object { -not (Test-Path -LiteralPath $_ -PathType Leaf) })

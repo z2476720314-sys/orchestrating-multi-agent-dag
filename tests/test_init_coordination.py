@@ -105,7 +105,7 @@ class CoordinationInitializerTests(unittest.TestCase):
                 relative = path.relative_to(fake_template)
                 self.assertFalse((observer / relative).exists(), str(relative))
 
-    def test_explicit_observer_refresh_backs_up_and_replaces_changed_files(self) -> None:
+    def test_explicit_observer_refresh_backs_up_code_only_and_replaces_changed_files(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             workspace = Path(temporary_directory)
             first = run_powershell(INIT_SCRIPT, "-Workspace", str(workspace))
@@ -113,6 +113,8 @@ class CoordinationInitializerTests(unittest.TestCase):
 
             target_version = workspace / ".agent-coordination" / "observer" / "VERSION"
             target_version.write_text("USER OBSERVER\n", encoding="utf-8")
+            target_code = workspace / ".agent-coordination" / "observer" / "static" / "app.js"
+            target_code.write_text("USER CODE\n", encoding="utf-8")
             expected_version = (SKILL_ROOT / "assets" / "observer-template" / "VERSION").read_text(
                 encoding="utf-8"
             )
@@ -125,10 +127,11 @@ class CoordinationInitializerTests(unittest.TestCase):
             )
             self.assertEqual(refreshed.returncode, 0, refreshed.stderr or refreshed.stdout)
             self.assertEqual(target_version.read_text(encoding="utf-8"), expected_version)
-            backups = tuple(target_version.parent.glob("VERSION.bak-*"))
-            self.assertEqual(len(backups), 1)
-            self.assertEqual(backups[0].read_text(encoding="utf-8"), "USER OBSERVER\n")
-            self.assertIn("refreshed: 1", refreshed.stdout)
+            self.assertEqual(tuple(target_version.parent.glob("VERSION.bak-*")), ())
+            code_backups = tuple(target_code.parent.glob("app.js.bak-*"))
+            self.assertEqual(len(code_backups), 1)
+            self.assertEqual(code_backups[0].read_text(encoding="utf-8"), "USER CODE\n")
+            self.assertIn("refreshed: 2", refreshed.stdout)
 
             target_version.write_text("SECOND USER OBSERVER\n", encoding="utf-8")
             refreshed_again = run_powershell(
@@ -142,8 +145,7 @@ class CoordinationInitializerTests(unittest.TestCase):
                 0,
                 refreshed_again.stderr or refreshed_again.stdout,
             )
-            backups = tuple(target_version.parent.glob("VERSION.bak-*"))
-            self.assertEqual(len(backups), 2)
+            self.assertEqual(tuple(target_version.parent.glob("VERSION.bak-*")), ())
 
     def test_rejects_filesystem_root_as_workspace(self) -> None:
         filesystem_root = Path.cwd().anchor

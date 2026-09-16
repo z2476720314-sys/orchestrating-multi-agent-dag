@@ -9,6 +9,7 @@ from ..model import AdapterResult, ObserverConfig, Snapshot, SourceHealth
 from .codex import CodexSource
 from .coordination import CoordinationSource
 from .dsh import DshSource
+from .runtime import RuntimeSource
 from .workbuddy import WorkBuddySource
 
 
@@ -16,7 +17,7 @@ def collect_snapshot(config: ObserverConfig) -> Snapshot:
     """Collect each read-only source once and merge normalized records."""
 
     results: list[AdapterResult] = []
-    for source_type in (CoordinationSource, CodexSource, DshSource, WorkBuddySource):
+    for source_type in (CoordinationSource, RuntimeSource, CodexSource, DshSource, WorkBuddySource):
         source_name = source_type.__name__.removesuffix("Source").casefold()
         try:
             results.append(source_type(config).collect())
@@ -51,6 +52,7 @@ __all__ = [
     "CodexSource",
     "CoordinationSource",
     "DshSource",
+    "RuntimeSource",
     "WorkBuddySource",
     "collect_snapshot",
 ]

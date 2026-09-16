@@ -14,7 +14,7 @@ from observer import ObserverConfig, collect_snapshot
 from observer.engine import ObserverEngine
 from observer.server import DEFAULT_PORT, LOOPBACK_HOST, create_server
 
-VERSION = "1.1.2"
+VERSION = "1.2.0"
 DEFAULT_WORKSPACE = Path(__file__).resolve().parents[2]
 
 

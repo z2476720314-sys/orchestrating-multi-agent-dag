@@ -219,6 +219,15 @@
       card.append(
         makeElement("p", "task__meta", `${safeText(task.owner_id, "负责人未知")} · ${count} 条关联事件`),
       );
+      if (task.phase || task.last_progress) {
+        card.append(
+          makeElement(
+            "p",
+            "task__progress",
+            `${safeText(task.phase, "阶段未知")} · ${safeText(task.last_progress, "暂无进展说明")}`,
+          ),
+        );
+      }
       container.append(card);
     });
   }
@@ -618,6 +627,86 @@
     return row;
   }
 
+  function appendEvidenceList(container, label, values) {
+    const items = asArray(values);
+    if (!items.length) return;
+    const row = makeElement("div", "delivery-entry__row");
+    row.append(makeElement("strong", "delivery-entry__label", label));
+    row.append(
+      makeElement(
+        "span",
+        "delivery-entry__value",
+        items.map((item) => safeText(item, UNKNOWN)).join(" · "),
+      ),
+    );
+    container.append(row);
+  }
+
+  function renderProgressAndDeliveries(container, events) {
+    const ordered = [...events].sort(compareEvents).reverse();
+    const progressEvents = ordered.filter(
+      (event) => event.kind === "progress" || event.kind === "task",
+    );
+    const deliveryEvents = ordered.filter((event) => event.kind === "delivery");
+
+    const progressSection = makeElement("section", "progress-feed");
+    progressSection.append(
+      makeElement("h4", "detail-events__heading", `实时进展 · ${progressEvents.length}`),
+    );
+    if (!progressEvents.length) {
+      progressSection.append(
+        makeElement("p", "empty-state", "暂无证据：Agent 尚未发布结构化进展。"),
+      );
+    }
+    progressEvents.slice(0, 30).forEach((event) => {
+      const entry = makeElement("article", `progress-entry ${statusClass(event.status)}`);
+      entry.append(makeElement("strong", "progress-entry__title", safeText(event.title, "进展")));
+      entry.append(
+        makeElement(
+          "span",
+          "progress-entry__meta",
+          `${safeText(event.phase, "阶段未知")} · ${formatTime(event.started_at || event.ended_at)}`,
+        ),
+      );
+      entry.append(
+        makeElement("p", "progress-entry__detail", safeText(event.detail, "进展说明暂无证据")),
+      );
+      appendEvidenceList(entry, "证据", event.evidence_refs);
+      progressSection.append(entry);
+    });
+    container.append(progressSection);
+
+    const deliverySection = makeElement("section", "delivery-feed");
+    deliverySection.append(
+      makeElement("h4", "detail-events__heading", `交付内容 · ${deliveryEvents.length}`),
+    );
+    if (!deliveryEvents.length) {
+      deliverySection.append(
+        makeElement("p", "empty-state", "暂无证据：Agent 尚未发布最终交付。"),
+      );
+    }
+    deliveryEvents.forEach((event) => {
+      const entry = makeElement("article", `delivery-entry ${statusClass(event.status)}`);
+      entry.append(
+        makeElement("strong", "delivery-entry__title", safeText(event.detail, "交付摘要暂无证据")),
+      );
+      entry.append(
+        makeElement(
+          "span",
+          "delivery-entry__meta",
+          `${statusLabel(event.status)} · ${formatTime(event.ended_at || event.started_at)}`,
+        ),
+      );
+      appendEvidenceList(entry, "修改文件", event.deliverables);
+      appendEvidenceList(entry, "测试", event.tests);
+      appendEvidenceList(entry, "产物", event.artifacts);
+      if (event.handoff) appendEvidenceList(entry, "Handoff", [event.handoff]);
+      appendEvidenceList(entry, "风险/未完成", event.concerns);
+      deliverySection.append(entry);
+    });
+    container.append(deliverySection);
+  }
+
   function branchEventDepth(event, byEventId) {
     let depth = 0;
     let cursor = event;
@@ -734,6 +823,7 @@
       ["Summary", node.meta],
     ].forEach(([label, value]) => list.append(detailRow(label, value)));
     container.append(list);
+    renderProgressAndDeliveries(container, node.data.events);
     if (node.type === "trace") renderBranchEvents(container, node.data.events);
     if (node.type === "agent") renderBranchEvents(container, node.data.events);
     if (node.type === "task") renderBranchEvents(container, node.data.events);
